@@ -1,19 +1,9 @@
 import React from "react";
-import { Center, ChakraProvider, HStack } from "@chakra-ui/react";
+import { Center, Text, HStack } from "@chakra-ui/react";
 import "./App.css";
-import {
-  Spacer,
-  Box,
-  Text,
-  VStack,
-  Flex,
-  InputRightAddon,
-  Input,
-  InputGroup,
-  Stack,
-} from "@chakra-ui/react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import MainPage from "./Components/MainPage";
+import AnimeFullDetails from "./Components/AnimeFullDetails";
 
 function App() {
   return (
@@ -25,6 +15,12 @@ function App() {
       </HStack>
       <Routes>
         <Route path="/" element={<MainPage />} />
+      </Routes>
+
+      <Routes>
+        <Route path="/anime/:name" element={<AnimeFullDetails/>} />
+        {/* <Route path="/anime/:name" element={AnimeFullDetails} /> */}
+        {/* <Route path="/detail" element={AnimeFullDetails} /> */}
       </Routes>
     </>
   );
