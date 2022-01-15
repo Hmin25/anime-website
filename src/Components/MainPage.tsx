@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Spacer,
+  Grid,
   Box,
   Text,
-  VStack,
+  Center,
   Image,
   InputRightAddon,
   Input,
@@ -12,78 +12,75 @@ import {
 } from "@chakra-ui/react";
 import Axios from "axios";
 import { Search2Icon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
+import Pagination from "./Pagination";
+import AnimeFullDetails from "./AnimeFullDetails";
 
-export default function MainPage() {
+export default function MainPage({
+  setImageURL,
+  setSynopsis,
+  setRating,
+  setScore,
+  setMembers,
+  setEpisode,
+}: any) {
   const [allAnimeData, setAllAnimeData] = useState<any>("");
   const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
-    async function getAllList() {
-      await Axios.get(`https://api.jikan.moe/v3/search/anime?q=naruto`)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res: any) => {
-          setAllAnimeData(res.data.results);
-        });
+    async function getAnimeData() {
+      if (searchInput !== "") {
+        await Axios.get(
+          `https://api.jikan.moe/v3/search/anime?q=${searchInput.toLowerCase()}`
+        )
+          .catch((err) => {
+            console.log(err);
+          })
+          .then((res: any) => {
+            if (res && res.data) {
+              setAllAnimeData(res.data.results);
+            }
+          });
+      }
     }
 
-    getAllList();
-  }, []);
-
-
-  useEffect(() => {
-    async function getAllList() {
-      await Axios.get(
-        `https://api.jikan.moe/v3/search/anime?q=${searchInput.toLowerCase()}`
-      )
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res: any) => {
-          setAllAnimeData(res.data.results);
-          console.log(allAnimeData);
-        });
-    }
-
-    getAllList();
+    getAnimeData();
   }, [searchInput]);
 
-
   const displayAnimeList = () => {
-    if (allAnimeData && allAnimeData.length > 0) {
-      return allAnimeData.map((anime:any, index:number) => (
-        <Box
-          as="button"
-          borderRadius="4px"
-          w="225px"
-          h="400px"
-          boxShadow="1px 1px 6px #D3D3D3"
-          key={index}
-          // onClick={() => {
-          //   history.push(`/channel/${channel.title}-${channel.id}`);
-          // }}
-        >
-          <Image src={anime.image_url}/>
-          <Text>{anime.title}</Text>
-        </Box>
-      )
-      )}
+    return (
+      <Pagination
+        animeList={allAnimeData}
+        itemsPerPage={8}
+        setImageURL={setImageURL}
+        setSynopsis={setSynopsis}
+        setRating={setRating}
+        setScore={setScore}
+        setMembers={setMembers}
+        setEpisode={setEpisode}
+      />
+    );
   };
+
+  useEffect(() => {
+    displayAnimeList();
+  }, [searchInput, allAnimeData]);
 
   return (
     <>
-      <Stack pt={5} align="center">
+      <Stack pt={7} align="center" overflowX="hidden">
         <InputGroup borderRadius="15px" size="md" w="40vw">
           <Input
             color="white"
             id="searchBar"
-            defaultValue="naruto"
+            // type="search"
             variant="filled"
-            placeholder="Search Channels, TV Shows, Movies"
+            placeholder="Search Anime with name"
             name="searchKeyword"
-            onBlur={(e: any) => {
-              setSearchInput(e.target.value);
+            onChange={(e: any) => {
+              setTimeout(() => {
+                setSearchInput(e.target.value);
+              }, 500);
             }}
           />
           <InputRightAddon
@@ -91,12 +88,7 @@ export default function MainPage() {
             bgColor="#7F00FF"
             cursor="pointer"
             onClick={() => {
-              // var a = document.querySelector(
-              //   "input[name=searchKeyword]"
-              // ).value;
-              // setTimeout(() => {
-              //   onClickSearch();
-              // }, 0);
+              displayAnimeList();
             }}
           >
             <Search2Icon color="white" />
@@ -104,10 +96,16 @@ export default function MainPage() {
         </InputGroup>
       </Stack>
 
-      <Stack w="100vw" h="60vh">
-        {allAnimeData && displayAnimeList()}
-
-      </Stack>
+      <Box w="70vw" h="100vh" pos="absolute" paddingLeft="25%">
+        <Grid
+          templateColumns="repeat(4, 1fr)"
+          gap={5}
+          rowGap={5}
+          paddingTop="4%"
+        >
+          {allAnimeData && displayAnimeList()}
+        </Grid>
+      </Box>
     </>
   );
 }
