@@ -1,17 +1,24 @@
 import ReactPaginate from "react-paginate";
 import "../App.css";
-import React, { useState, useEffect, useRef } from "react";
-import Axios from "axios";
-import { Box, Image, Text } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Box, Image, Text, Stack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import AnimeFullDetails from "./AnimeFullDetails";
 
-export default function Pagination({ animeList, itemsPerPage }: any) {
+export default function Pagination({
+  animeList,
+  itemsPerPage,
+  setImageURL,
+  setSynopsis,
+  setRating,
+  setScore,
+  setMembers,
+  setEpisode,
+}: any) {
+
   const history = useNavigate();
 
-  console.log("GET ANIME LIST:", animeList);
-
-  const items = animeList;
-
+  const animeData = animeList;
   function Items({ currentItems }: any) {
     return (
       <>
@@ -28,9 +35,13 @@ export default function Pagination({ animeList, itemsPerPage }: any) {
               flexDir="column"
               overflow="hidden"
               onClick={() => {
-                // setCurrentAnimeImage(anime.image_url);
-                // setCurrentAnimeSynopsis(anime.synopsis);
-                setTimeout(() => history(`/anime/${anime.title}`), 500);
+                setImageURL(anime.image_url);
+                setSynopsis(anime.synopsis);
+                setRating(anime.rated);
+                setScore(anime.score);
+                setMembers(anime.members);
+                setEpisode(anime.episodes);
+                history("/anime/" + anime.title);
               }}
             >
               <Image w="100%" h="300px" src={anime.image_url} />
@@ -41,36 +52,30 @@ export default function Pagination({ animeList, itemsPerPage }: any) {
     );
   }
 
-//   const displayAnimeList = () => {
-//     return <Items currentItems={currentItems} />;
-//   };
-
-//   useEffect(() => {
-//     displayAnimeList();
-//   }, []);
-
   const [currentItems, setCurrentItems] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
 
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
-    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
-    setCurrentItems(items.slice(itemOffset, endOffset));
-    setPageCount(Math.ceil(items.length / itemsPerPage));
-  }, [itemOffset, itemsPerPage]);
+    setCurrentItems(animeData.slice(itemOffset, endOffset));
+    setPageCount(Math.ceil(animeData.length / itemsPerPage));
+  }, [itemOffset, itemsPerPage, animeData]);
 
   const handlePageClick = (event: any) => {
-    const newOffset = (event.selected * itemsPerPage) % items.length;
+    const newOffset = (event.selected * itemsPerPage) % animeData.length;
     console.log(
       `User requested page number ${event.selected}, which is offset ${newOffset}`
     );
     setItemOffset(newOffset);
   };
+
   return (
     <>
+      {/* Here are the 8 pages to click */}
       <Items currentItems={currentItems} />
-      {/* {animeList && displayAnimeList()} */}
+
+      {/* Here are the number to click and flip pages */}
       <ReactPaginate
         nextLabel=">"
         onPageChange={handlePageClick}
