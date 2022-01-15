@@ -89,7 +89,6 @@ export default function MainPage({
             cursor="pointer"
             onClick={() => {
               displayAnimeList();
-              // console.log("Clicked");
             }}
           >
             <Search2Icon color="white" />
